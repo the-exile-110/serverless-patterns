@@ -5,8 +5,8 @@ import datetime
 s3 = boto3.client('s3')
 logs = boto3.client('logs')
 
-LOG_GROUP_NAMES = ['test-log-group-1', 'test-log-group-2']
-BUCKET_NAME = 'test-bucket'
+LOG_GROUP_NAMES = ['/aws/lambda/SSTBootstrap-CustomS3AutoDeleteObjectsCustomResour-cCZrLAUydYCe']
+BUCKET_NAME = 'qq-tmp'
 ROTATION_DAYS = 15
 
 
