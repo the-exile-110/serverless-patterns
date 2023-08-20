@@ -30,13 +30,13 @@ Resources:
         - AWSLambdaExecute
       Events:
         APIRoot:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /
             Method: ANY
             RestApiId: !Ref PrivateApiApiGateway
         API:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /{proxy+}
             Method: ANY
@@ -57,11 +57,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
-  ######################################################################
-  #  API Gateway                                                       #
-  ######################################################################
-
-  # Api GatewayへのLambdaアクセス許可
+  # Api Gateway Lambda Permission
   LambdaFunctionPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -77,7 +73,7 @@ Resources:
       Name: private-api
       StageName: Prod
       MethodSettings:
-        # ログを有効化
+        # Enable CloudWatch logging for all API methods
         - DataTraceEnabled: true
           LoggingLevel: 'INFO'
           ResourcePath: '/*'
@@ -125,7 +121,7 @@ Resources:
                 type: aws_proxy
         x-amazon-apigateway-binary-media-types:
           - '*/*'
-        # VPCエンドポイントからのリクエストのみに制限する。
+        # VPC Endpoint access policy
         x-amazon-apigateway-policy:
           Version: '2012-10-17'
           Statement:
@@ -138,12 +134,7 @@ Resources:
                 StringEquals:
                   aws:SourceVpce: !Ref PrivateApiVpcEndpoint
 
-
-  ######################################################################
-  #  API Gateway共通設定                                                #
-  ######################################################################
-
-  # API Gatewayのログ出力用ロール
+  # API Gateway CloudWatch Role
   ApiGatewayCloudWatchRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -158,18 +149,13 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
-  # API Gatewayにログ出力用ロールを設定
+  # API Gateway CloudWatch Role
   ApiGatewayAccount:
     Type: 'AWS::ApiGateway::Account'
     Properties:
       CloudWatchRoleArn: !GetAtt ApiGatewayCloudWatchRole.Arn
 
-
-  ######################################################################
-  #  VPCエンドポイント                                                   #
-  ######################################################################
-
-  # VPCエンドポイント
+  # VPC Endpoint
   PrivateApiVpcEndpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
@@ -183,7 +169,7 @@ Resources:
       PrivateDnsEnabled: true
 
 
-  # VPCエンドポイント用セキュリティグループ
+  # VPC Endpoint Security Group
   PrivateApiSg:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -195,7 +181,6 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
-
 
 Outputs:
   LambdaFunctionPrivateApi:
