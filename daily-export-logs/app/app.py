@@ -17,12 +17,13 @@ def export_logs_to_s3(log_group):
 
     print(f"Exporting logs from {log_group} to S3 bucket {BUCKET_NAME} with prefix {safe_log_group}/before_{end_time.strftime('%Y-%m-%d')}")
 
+    # Path: AWSLogs/<AccountID>/<CloudWatchロググループ名>/<region>/<年>/<月>/<日>/<ログファイル>
     response = logs.create_export_task(
         logGroupName=log_group,
         fromTime=int(start_time.timestamp() * 1000),
         to=int(end_time.timestamp() * 1000),
         destination=BUCKET_NAME,
-        destinationPrefix=f'{safe_log_group}/before_{end_time.strftime("%Y-%m-%d")}'
+        destinationPrefix=f'AWSLogs/{logs.meta.region_name}/{safe_log_group}/before_{end_time.strftime("%Y-%m-%d")}'
     )
 
     task_id = response['taskId']
